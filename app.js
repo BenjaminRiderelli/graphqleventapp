@@ -78,12 +78,26 @@ app.use(
           description: args.eventInput.description,
           price: +args.eventInput.price,
           date: new Date(args.eventInput.date),
+          creator: "64ecef3badae04d87ca316c7",
         });
+
+        let createdEvent
         return event
           .save()
           .then((result) => {
+            createdEvent = { ...result._doc }
+            return User.findById("64ecef3badae04d87ca316c7");
+          })
+          .then((user) => {
+            if (!user) {
+              throw new Error("user not found!");
+            }
+            user.createdEvents.push(event);
+            return user.save()
+          })
+          .then((result) => {
             console.log(result);
-            return { ...result._doc };
+            return createdEvent;
           })
           .catch((err) => {
             console.log(err);
@@ -91,19 +105,26 @@ app.use(
           });
       },
       createUser: (args) => {
-        
-        return bcrypt
-          .hash(args.userInput.password, 12)
+        return User.findOne({ email: args.userInput.email })
+          .then((user) => {
+            if (user) {
+              throw new Error("user already exists!");
+            }
+            return bcrypt.hash(args.userInput.password, 12);
+          })
           .then((hashedPassword) => {
             const user = new User({
               email: args.userInput.email,
               password: hashedPassword,
             });
-            return user.save()
-          }).
-          then(result => {
-            return {...result._doc, password:null}
+            return user.save();
           })
+          .then((result) => {
+            return { ...result._doc, password: null };
+          })
+          .catch((err) => {
+            throw err;
+          });
       },
     },
     graphiql: true,
