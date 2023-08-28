@@ -3,6 +3,10 @@ import bodyParser from "body-parser";
 import { graphqlHTTP } from "express-graphql";
 import { buildSchema } from "graphql";
 import mongoose from "mongoose";
+import dotenv from 'dotenv'
+dotenv.config()
+
+
 
 const app = express();
 
@@ -64,7 +68,8 @@ app.use(
   })
 );
 
+
 mongoose.connect(
-  `mongodb+srv://root:rmZXByWmjS5srEUP@atlascluster.cqioaqn.mongodb.net/?retryWrites=true&w=majority`
+  `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@atlascluster.cqioaqn.mongodb.net/?retryWrites=true&w=majority`
 );
 app.listen(3000);
