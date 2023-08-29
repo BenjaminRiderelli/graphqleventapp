@@ -13,6 +13,18 @@ dotenv.config();
 const app = express();
 
 app.use(bodyParser.json());
+
+const user = (userId) => {
+  return User.findById(userId)
+    .populate("createdEvents")
+    .then((user) => {
+      return { ...user._doc, _id: user.id };
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
 app.use(
   "/graphql",
   graphqlHTTP({
@@ -24,12 +36,14 @@ app.use(
             description: String!
             price: Float!
             date: String!
+            creator:User!
         }
 
         type User{
             _id:ID!
             email:String!
             password:String
+            createdEvents:[Event!]
         }
 
 
@@ -62,15 +76,18 @@ app.use(
     `),
     rootValue: {
       events: () => {
-        return Event.find()
-          .then((events) => {
-            return events.map((event) => {
-              return { ...event._doc };
-            });
-          })
-          .catch((err) => {
-            throw err;
-          });
+        return (
+          Event.find()
+            // .populate("creator")
+            .then((events) => {
+              return events.map((event) => {
+                return { ...event._doc, creator: user(event._doc.creator) };
+              });
+            })
+            .catch((err) => {
+              throw err;
+            })
+        );
       },
       createEvent: (args) => {
         const event = new Event({
@@ -81,11 +98,14 @@ app.use(
           creator: "64ecef3badae04d87ca316c7",
         });
 
-        let createdEvent
+        let createdEvent;
         return event
           .save()
           .then((result) => {
-            createdEvent = { ...result._doc }
+            createdEvent = {
+              ...result._doc,
+              creator: user(result._doc.creator),
+            };
             return User.findById("64ecef3badae04d87ca316c7");
           })
           .then((user) => {
@@ -93,7 +113,7 @@ app.use(
               throw new Error("user not found!");
             }
             user.createdEvents.push(event);
-            return user.save()
+            return user.save();
           })
           .then((result) => {
             console.log(result);
