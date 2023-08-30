@@ -6,8 +6,8 @@ import bcrypt from "bcryptjs";
 const user = async (userId) => {
   try {
     const userDoc = await User.findById(userId).populate("createdEvents");
-    // const userResponse = { ...userDoc._doc, _id: userDoc.id };
-    return userDoc;
+    const userResponse = { ...userDoc._doc, _id: userDoc.id };
+    return userResponse;
   } catch (err) {
     throw err;
   }
@@ -20,6 +20,14 @@ const singleEvent = async (eventId) => {
   } catch (e) {
     throw e;
   }
+};
+
+const transformEvent = (event) => {
+  return {
+    ...event._doc,
+    creator: user(event._doc.creator),
+    date: new Date(event._doc.date).toISOString(),
+  };
 };
 
 export const rootValue = {
@@ -52,7 +60,7 @@ export const rootValue = {
       const result = await event.save();
       createdEvent = {
         ...result._doc,
-        date: new Date(event._doc.date).toISOString(),
+        date: new Date(result._doc.date).toISOString(),
         creator: user(result._doc.creator),
       };
 
