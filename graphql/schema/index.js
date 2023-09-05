@@ -2,6 +2,7 @@ import { buildSchema } from "graphql";
 
 export const graphQLSchema = buildSchema(`
 
+
         type Booking{
             _id: ID!
             event: Event!
@@ -28,6 +29,13 @@ export const graphQLSchema = buildSchema(`
         }
 
 
+        type AuthData{
+            userId:ID!
+            token: String!
+            tokenExpiration: Int!
+        }
+
+
         input EventInput{
             title: String!
             description: String!
@@ -43,6 +51,7 @@ export const graphQLSchema = buildSchema(`
         type RootQuery{
             events: [Event!]!
             bookings: [Booking!]!
+            login(email:String!, password:String!): AuthData!
         }
 
         type RootMutation{
