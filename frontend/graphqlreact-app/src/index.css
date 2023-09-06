@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --light-bg-color: white;
+  --dark-bg-color: #191e2d;
+  --light-text-color: #191e2d;
+  --dark-text-color: white;
+  --primary-btn-color: #fa2256;
+  --secondary-btn-color: #262c42;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
