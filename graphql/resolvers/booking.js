@@ -3,8 +3,11 @@ import { Booking } from "../../models/booking.js";
 import { transformBooking, transformEvent } from "./resolverutils.js";
 
 export const bookingResolver = {
+  bookings: async (args, req) => {
+    if (!req.isAuth) {
+      throw new Error("Unauthorized");
+    }
 
-  bookings: async () => {
     try {
       const bookings = await Booking.find();
       return bookings.map((booking) => {
@@ -14,7 +17,11 @@ export const bookingResolver = {
       throw err;
     }
   },
-  bookEvent: async (args) => {
+  bookEvent: async (args, req) => {
+    if (!req.isAuth) {
+      throw new Error("Unauthorized");
+    }
+
     try {
       const fetchedEvent = await Event.findOne({ _id: args.eventId });
       if (!fetchedEvent) {
@@ -23,7 +30,7 @@ export const bookingResolver = {
         );
       }
       const booking = new Booking({
-        user: "64ecef3badae04d87ca316c7",
+        user: req.userId,
         event: fetchedEvent,
       });
       const result = await booking.save();
@@ -32,7 +39,10 @@ export const bookingResolver = {
       throw e;
     }
   },
-  cancelBooking: async (args) => {
+  cancelBooking: async (args, req) => {
+    if (!req.isAuth) {
+      throw new Error("Unauthorized");
+    }
     try {
       const booking = await Booking.findById(args.bookingId).populate("event");
       const event = transformEvent(booking.event);

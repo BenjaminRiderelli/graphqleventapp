@@ -1,8 +1,7 @@
 import { dateToString } from "../../helpers/date.js";
 import { Event } from "../../models/event.js";
+import { User } from "../../models/user.js";
 import { transformEvent } from "./resolverutils.js";
-
-
 
 export const eventResolver = {
   events: async () => {
@@ -15,14 +14,19 @@ export const eventResolver = {
       throw err;
     }
   },
-  createEvent: async (args) => {
+  createEvent: async (args, req) => {
+    
+    if (!req.isAuth) {
+      throw new Error("Unauthorized");
+    }
+
     try {
       const event = new Event({
         title: args.eventInput.title,
         description: args.eventInput.description,
         price: +args.eventInput.price,
         date: dateToString(args.eventInput.date),
-        creator: "64ecef3badae04d87ca316c7",
+        creator: req.userId,
       });
 
       let createdEvent;
@@ -30,7 +34,7 @@ export const eventResolver = {
       const result = await event.save();
       createdEvent = transformEvent(result);
 
-      const creator = await User.findById("64ecef3badae04d87ca316c7");
+      const creator = await User.findById(req.userId);
       if (!creator) {
         throw new Error("user not found!");
       }
