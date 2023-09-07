@@ -6,12 +6,21 @@ import dotenv from "dotenv";
 import { graphQLSchema } from "./graphql/schema/index.js";
 import { rootResolver } from "./graphql/resolvers/index.js";
 import { authMiddleware } from "./middleware/jwtauth.js";
+import cors from "cors";
 
 dotenv.config();
 const app = express();
 app.use(bodyParser.json());
 
-app.use(authMiddleware);
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next()
+});
 
 app.use(
   "/graphql",
