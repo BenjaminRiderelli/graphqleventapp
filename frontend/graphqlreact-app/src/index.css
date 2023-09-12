@@ -16,3 +16,23 @@ body {
   margin: 0;
   min-width: 320px;
 }
+
+@layer utilities {
+  @variants responsive {
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    textarea {
+      resize: none;
+    }
+    .actionshrink {
+      transform: scale(0.98);
+    }
+
+    .textarea {
+      resize: none;
+    }
+  }
+}

@@ -4,22 +4,28 @@ type ContextProps = {
   children: React.ReactNode;
 };
 
-type ContextValues = {
+type userSession = {
   token: string;
-  setToken: (newToken: string) => void;
+  userId: string;
+  tokenExpiration: number;
+};
+
+type ContextValues = {
+  userSession: userSession | null;
+  setUserSession: ({}: userSession | null) => void
 };
 
 export const Context = createContext<ContextValues>({
-  token: "",
-  setToken: () => {},
+  userSession: null,
+  setUserSession: () => {},
 });
 
 export const ContextProvider = ({ children }: ContextProps) => {
-  const [token, setToken] = useState<string>("");
+  const [userSession, setUserSession] = useState<null | userSession>(null);
 
   const contextValue: ContextValues = {
-    token: token,
-    setToken: setToken,
+    userSession: userSession,
+    setUserSession: setUserSession,
   };
 
   return <Context.Provider value={contextValue}>{children}</Context.Provider>;

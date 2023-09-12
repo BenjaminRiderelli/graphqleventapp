@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { Context } from "../context";
+import { useNavigate, Navigate } from "react-router-dom";
 
 type LoginFormInput = {
   email: string;
@@ -16,10 +17,9 @@ const AuthPage = () => {
   const [message, setMessage] = useState("");
   const [requestType, setRequestType] = useState<RequestType>("login");
 
-  const {token} = useContext(Context)
+  const { setUserSession, userSession } = useContext(Context);
 
-  console.log(token)
-
+  const navigate = useNavigate();
 
   const handleChange = (name: string, value: string) => {
     setFormInput((prevState) => {
@@ -77,7 +77,11 @@ const AuthPage = () => {
         return;
       }
       setMessage("");
-      console.log(payload.data.login);
+      if (payload.data.login.token) {
+        const payloadData = payload.data.login;
+        setUserSession(payloadData);
+        navigate("/events");
+      }
     } catch (e) {
       console.log(e);
     }
@@ -90,6 +94,10 @@ const AuthPage = () => {
       setRequestType("login");
     }
   };
+
+  if (userSession?.token) {
+    return <Navigate to="/events" />;
+  }
 
   return (
     <main className="flex items-center justify-center w-full h-[calc(100%)] mt-16 border-t-0 border-2 border-black">

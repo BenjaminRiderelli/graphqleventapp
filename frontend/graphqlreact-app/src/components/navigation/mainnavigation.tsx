@@ -1,9 +1,19 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { Context } from "../../context";
 import CustomNavLink from "./customnavlink";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const MainNavigation = () => {
   const [nav, setNav] = useState(false);
+
+  const navigate = useNavigate();
+  const { userSession, setUserSession } = useContext(Context);
+
+  const logOut = () => {
+    setUserSession(null);
+    navigate("/auth");
+  };
 
   return (
     <header
@@ -22,17 +32,32 @@ const MainNavigation = () => {
         />
         <ul className="hidden md:flex gap-8">
           <li>
-            <CustomNavLink to="/auth">Home</CustomNavLink>
-          </li>
-          <li>
             <CustomNavLink to="/events">Events</CustomNavLink>
           </li>
-          <li>
-            <CustomNavLink to="/bookings">Bookings</CustomNavLink>
-          </li>
+          {userSession?.token && (
+            <li>
+              <CustomNavLink to="/bookings">Bookings</CustomNavLink>
+            </li>
+          )}
         </ul>
       </nav>
-      <div className="hidden md:flex">something</div>
+      {userSession?.token ? (
+        <button
+          onClick={() => {
+            logOut();
+          }}
+          className="hidden md:flex border-2 border-dark-bg-color px-2 py-1 active:scale-95"
+        >
+          Log out
+        </button>
+      ) : (
+        <NavLink
+          to="/auth"
+          className="hidden md:flex border-2 border-dark-bg-color px-2 py-1 active:scale-95"
+        >
+          Log In
+        </NavLink>
+      )}
       <aside
         className={`${
           nav
@@ -42,27 +67,46 @@ const MainNavigation = () => {
         onClick={() => setNav(false)}
       >
         <div className=" bg-light-bg-color z-50 w-2/3 h-full px-6 py-8 ">
-          <div className="flex flex-col justify-between h-1/2">
-            <div className="flex justify-between w-full">
-              <h2 className="font-black text-2xl">Easy Booking</h2>
-              <AiOutlineClose
-                className="md:hidden"
-                style={{ fontSize: "2rem" }}
-                onClick={() => setNav(true)}
-              />
+          <div className="flex flex-col justify-between h-full">
+            <div className="flex flex-col gap-20">
+              <div className="flex justify-between w-full">
+                <h2 className="font-black text-2xl">Easy Booking</h2>
+                <AiOutlineClose
+                  className="md:hidden"
+                  style={{ fontSize: "2rem" }}
+                  onClick={() => setNav(true)}
+                />
+              </div>
+              <ul className="flex flex-col gap-6">
+                <li className="text-lg">
+                  <CustomNavLink to="/events">Events</CustomNavLink>
+                </li>
+                {userSession?.token && (
+                  <li className="text-lg">
+                    <CustomNavLink to="/bookings">Bookings</CustomNavLink>
+                  </li>
+                )}
+              </ul>
             </div>
-            <ul className="flex flex-col gap-6">
-              <li className="text-lg">
-                <CustomNavLink to="/auth">Home</CustomNavLink>
-              </li>
-              <li className="text-lg">
-                <CustomNavLink to="/events">Events</CustomNavLink>
-              </li>
-              <li className="text-lg">
-                <CustomNavLink to="/bookings">Bookings</CustomNavLink>
-              </li>
-            </ul>
-            <div className="flex flex-col w-full h-32 gap-4"></div>
+            <div className="flex flex-col w-full h-32 gap-4">
+              {userSession?.token ? (
+                <button
+                  onClick={() => {
+                    logOut();
+                  }}
+                  className=" md:flex border-2 border-dark-bg-color px-2 py-1 active:scale-95"
+                >
+                  Log out
+                </button>
+              ) : (
+                <NavLink
+                  to="/auth"
+                  className=" md:flex border-2 border-dark-bg-color px-2 py-1 active:scale-95"
+                >
+                  Log In
+                </NavLink>
+              )}
+            </div>
           </div>
         </div>
         <div className="w-1/3 h-full bg-dark-bg-color opacity-75"></div>

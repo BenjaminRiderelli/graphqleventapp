@@ -4,6 +4,7 @@ import AuthPage from "./pages/auth";
 import EventsPage from "./pages/events";
 import BookingsPage from "./pages/bookings";
 import MainNavigation from "./components/navigation/mainnavigation";
+import NotFound from "./pages/not-found";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/bookings" element={<BookingsPage />} />
+        <Route path="/*" element={<NotFound/>}/>
       </Routes>
     </div>
   );
