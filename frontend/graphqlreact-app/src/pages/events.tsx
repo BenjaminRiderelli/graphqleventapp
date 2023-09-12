@@ -1,4 +1,4 @@
-import { useState, PropsWithChildren, ChangeEvent, MouseEvent } from "react";
+import { useState, PropsWithChildren, ChangeEvent } from "react";
 import Modal from "../components/modal/modal";
 
 type FormDataType = {
@@ -9,7 +9,7 @@ type FormDataType = {
 };
 
 const FormControl = ({ children }: PropsWithChildren) => {
-  return <div className="flex flex-col">{children}</div>;
+  return <div className="flex flex-col gap-1">{children}</div>;
 };
 
 const EventsPage = () => {
@@ -34,20 +34,27 @@ const EventsPage = () => {
   };
 
   const handleSubmit = (data: FormDataType) => {
-    type KeyType = "title" | "price" | "date" | "description"
-    let missingKeys:string[] = [];
-    
+    type KeyType = "title" | "price" | "date" | "description";
+    let missingKeys: string[] = [];
+
     Object.keys(data).forEach((key) => {
-      const value = data[key as KeyType]
+      const value = data[key as KeyType];
       if (!value) {
         missingKeys.push(key as KeyType);
       }
-    })
-    
-    if(missingKeys.length !== 0){
-      setMessage(`${missingKeys.join(", ")} fields are missing`)
+    });
+
+    if (missingKeys.length !== 0) {
+      setMessage(`${missingKeys.join(", ")} fields are missing`);
+      return;
     }
-    
+    console.log(formData);
+  };
+
+  const closeModalFn = () => {
+    setMessage("");
+    setFormData({ title: "", price: 0, description: "", date: "" });
+    setOpenModal(false);
   };
 
   return (
@@ -55,10 +62,7 @@ const EventsPage = () => {
       {openModal && (
         <Modal
           title="Create an event"
-          cancelFn={() => {
-            setMessage("");
-            setOpenModal(false);
-          }}
+          cancelFn={closeModalFn}
           confirmFn={() => {
             handleSubmit(formData);
           }}
