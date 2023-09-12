@@ -22,8 +22,6 @@ const EventsPage = () => {
     date: "",
   });
 
-  const { title, price, description, date } = formData;
-
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -39,11 +37,10 @@ const EventsPage = () => {
 
     Object.keys(data).forEach((key) => {
       const value = data[key as KeyType];
-      if (!value) {
-        missingKeys.push(key as KeyType);
+      if (!value  && key !== "price") {
+        missingKeys.push(key);
       }
     });
-
     if (missingKeys.length !== 0) {
       setMessage(`${missingKeys.join(", ")} fields are missing`);
       return;
@@ -57,6 +54,7 @@ const EventsPage = () => {
     setOpenModal(false);
   };
 
+  const { title, price, description, date } = formData;
   return (
     <main className="flex items-center justify-center w-full h-[calc(100%)] mt-16 border-2 border-t-0 border-black">
       {openModal && (
