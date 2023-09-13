@@ -1,7 +1,6 @@
 import { useState, useContext } from "react";
 import { Context } from "../context";
 import { useNavigate, Navigate } from "react-router-dom";
-
 type LoginFormInput = {
   email: string;
   password: string;

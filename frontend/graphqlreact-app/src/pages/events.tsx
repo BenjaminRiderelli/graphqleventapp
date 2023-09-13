@@ -7,6 +7,9 @@ import {
 } from "react";
 import Modal from "../components/modal/modal";
 import { Context } from "../context";
+import EventListItem from "../components/eventlistitem/eventlistitem";
+import Spinner from "../components/spinner/spinner";
+import { formatDate } from "../utils";
 
 type FormDataType = {
   title: string;
@@ -34,8 +37,19 @@ const FormControl = ({ children }: PropsWithChildren) => {
 };
 
 const EventsPage = () => {
-  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
+  const [openDetailsModal, setOpenDetailsModal] = useState<boolean>(false);
+  const [detailModalInfo, setDetailModalInfo] = useState<EventType>({
+    _id: "",
+    title: "",
+    price: 0,
+    description: "",
+    date: "",
+    creator: { _id: "", email: "" },
+  });
   const [message, setMessage] = useState<string>("");
+  const [effectBoolean, setEffectBoolean] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormDataType>({
     title: "",
     price: 0,
@@ -46,6 +60,7 @@ const EventsPage = () => {
   const { userSession } = useContext(Context);
 
   useEffect(() => {
+    setIsLoading(true);
     const requestBody = {
       query: `
           query {
@@ -67,20 +82,21 @@ const EventsPage = () => {
       method: "POST",
       body: JSON.stringify(requestBody),
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
     })
       .then((res) => {
         if (res.status !== 200 && res.status !== 201) {
-          throw new Error("Failed!");
+          throw new Error("Something went wrong!");
         }
         return res.json();
       })
       .then((payload) => {
-        console.log(payload.data.events);
         setEventsList(payload.data.events);
-      });
-  }, []);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
+  }, [effectBoolean]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -140,6 +156,7 @@ const EventsPage = () => {
     }
 
     const payload = await res.json();
+    setEffectBoolean(!effectBoolean);
     closeModalFn();
     return payload;
   };
@@ -147,19 +164,28 @@ const EventsPage = () => {
   const closeModalFn = () => {
     setMessage("");
     setFormData({ title: "", price: 0, description: "", date: "" });
-    setOpenModal(false);
+    setOpenAddModal(false);
+    setOpenDetailsModal(false);
   };
+
+  const showDetailsFn = (event: EventType) => {
+    setOpenDetailsModal(true);
+    setDetailModalInfo(event);
+  };
+
+  const handleBookEvent = () => {}
 
   const { title, price, description, date } = formData;
   return (
     <main className="flex flex-col items-center justify-center gap-8 w-full h-[calc(100%)] mt-16 border-2 border-t-0 border-black">
-      {openModal && (
+      {openAddModal && (
         <Modal
           title="Create an event"
           cancelFn={closeModalFn}
           confirmFn={() => {
             handleSubmit(formData);
           }}
+          btnText="Confirm"
         >
           <form className="flex flex-col gap-4">
             <p className="h-4 mb-8">{message}</p>
@@ -210,12 +236,51 @@ const EventsPage = () => {
           </form>
         </Modal>
       )}
+      {openDetailsModal && (
+        <Modal
+          title={detailModalInfo?.title}
+          cancelFn={closeModalFn}
+          confirmFn={handleBookEvent}
+          btnText={"Book event"}
+        >
+          <section className="flex flex-col md:flex-row justify-between gap-4 w-full">
+            <div className="flex flex-col gap-4 w-1/2">
+              <FormControl>
+                <p>Creator</p>
+                <p>{detailModalInfo?.creator.email}</p>
+              </FormControl>
+              <FormControl>
+                <p>Date</p>
+                <p>{formatDate(detailModalInfo?.date)}</p>
+              </FormControl>
+              <FormControl>
+                <p>Price</p>
+                <p>€ {detailModalInfo?.price}</p>
+              </FormControl>
+            </div>
+            <div className="flex flex-col gap-4 md:w-1/2">
+              <FormControl>
+                <p className="mb-4">Description</p>
+                <textarea
+                  className="border-2 border-dashed border-dark-bg-color rounded px-2 py-1"
+                  id="description"
+                  disabled={true}
+                  value={detailModalInfo.description}
+                  name="description"
+                  rows={4}
+                  onChange={handleChange}
+                />
+              </FormControl>
+            </div>
+          </section>
+        </Modal>
+      )}
       {userSession?.token && (
         <div className="flex flex-col gap-6 justify-center items-center border-2 border-dark-bg-color w-3/4 h-40 ">
           <p className="w-full text-center">Share your own events!</p>
           <button
             onClick={() => {
-              setOpenModal(true);
+              setOpenAddModal(true);
             }}
             className=" md:flex border-2 border-dark-bg-color px-2 py-1 active:scale-95"
           >
@@ -223,10 +288,20 @@ const EventsPage = () => {
           </button>
         </div>
       )}
-      <ul className="flex flex-col gap-2 w-[40rem] max-w-[90%] h-[40rem] max-h-[60%] list-none p-4 overflow-scroll">
-        {eventsList.map((event) => {
-          return <li className="p-4 border-2 border-dark-bg-color">{event.title}</li>;
-        })}
+      <ul className="flex flex-col gap-2 w-[50rem] max-w-[90%] h-[40rem] max-h-[60%] list-none p-4 overflow-y-auto">
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          eventsList.map((event) => {
+            return (
+              <EventListItem
+                key={event._id}
+                event={event}
+                showDetails={showDetailsFn}
+              />
+            );
+          })
+        )}
       </ul>
     </main>
   );

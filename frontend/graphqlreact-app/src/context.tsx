@@ -12,7 +12,7 @@ type userSession = {
 
 type ContextValues = {
   userSession: userSession | null;
-  setUserSession: ({}: userSession | null) => void
+  setUserSession: ({}: userSession | null) => void;
 };
 
 export const Context = createContext<ContextValues>({
