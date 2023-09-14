@@ -121,49 +121,61 @@ const EventsPage = () => {
       setMessage(`${missingKeys.join(", ")} fields are missing`);
       return;
     }
-    const requestBody = {
-      query: `
-          mutation {
-            createEvent(eventInput: {title: "${title}", 
-            description: "${description}", 
-            price: ${Number(price)}, 
-            date: "${date}"}) {
-              _id
-              title
-              description
-              date
-              price
-              creator {
+    try {
+      const requestBody = {
+        query: `
+            mutation {
+              createEvent(eventInput: {title: "${title}", 
+              description: "${description}", 
+              price: ${Number(price)}, 
+              date: "${date}"}) {
                 _id
-                email
+                title
+                description
+                date
+                price
+                creator {
+                  _id
+                  email
+                }
               }
             }
-          }
-        `,
-    };
+          `,
+      };
+      const res = await fetch("http://localhost:3000/graphql", {
+        method: "POST",
+        body: JSON.stringify(requestBody),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + userSession?.token,
+        },
+      });
 
-    const res = await fetch("http://localhost:3000/graphql", {
-      method: "POST",
-      body: JSON.stringify(requestBody),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + userSession?.token,
-      },
-    });
+      if (res.status !== 200 && res.status !== 201) {
+        throw new Error("Failed!");
+      }
 
-    if (res.status !== 200 && res.status !== 201) {
-      throw new Error("Failed!");
+      const payload = await res.json();
+      setEffectBoolean(!effectBoolean);
+      closeModalFn();
+      return payload;
+    } catch (e) {
+      console.log(e);
+      setMessage("something went wrong x_x");
     }
-
-    const payload = await res.json();
-    setEffectBoolean(!effectBoolean);
-    closeModalFn();
-    return payload;
   };
 
   const closeModalFn = () => {
     setMessage("");
     setFormData({ title: "", price: 0, description: "", date: "" });
+    setDetailModalInfo({
+      _id: "",
+      title: "",
+      price: 0,
+      description: "",
+      date: "",
+      creator: { _id: "", email: "" },
+    });
     setOpenAddModal(false);
     setOpenDetailsModal(false);
   };
@@ -173,7 +185,45 @@ const EventsPage = () => {
     setDetailModalInfo(event);
   };
 
-  const handleBookEvent = () => {}
+  const handleBookEvent = async () => {
+    if (!userSession?.token) {
+      setMessage("Login to book an event");
+      return;
+    }
+
+    try {
+      const requestBody = {
+        query: `
+            mutation {
+              bookEvent(eventId:"${detailModalInfo._id}") { 
+                _id
+                createdAt
+                updatedAt
+              }
+            }
+          `,
+      };
+      const res = await fetch("http://localhost:3000/graphql", {
+        method: "POST",
+        body: JSON.stringify(requestBody),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + userSession?.token,
+        },
+      });
+
+      if (res.status !== 200 && res.status !== 201) {
+        throw new Error("Failed!");
+      }
+
+      const payload = await res.json();
+      console.log(payload);
+      closeModalFn()
+    } catch (e) {
+      console.log(e);
+      setMessage("Something went wrong x_x");
+    }
+  };
 
   const { title, price, description, date } = formData;
   return (
@@ -270,6 +320,7 @@ const EventsPage = () => {
                   rows={4}
                   onChange={handleChange}
                 />
+                <p className="h-8 pt-2">{message}</p>
               </FormControl>
             </div>
           </section>

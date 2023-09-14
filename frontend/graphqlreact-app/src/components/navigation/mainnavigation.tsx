@@ -19,7 +19,7 @@ const MainNavigation = () => {
     <header
       className={`fixed top-0 flex justify-between items-center ${
         nav ? "" : "border-2"
-      } border-dark-bg-color w-full h-16 p-4 px-16 text-2xl`}
+      } border-dark-bg-color w-full h-16 p-4 px-16 text-2xl z-40`}
     >
       <div>
         <h1 className="font-black text-2xl">Easy Booking</h1>
