@@ -1,6 +1,7 @@
 import { dateToString } from "../../helpers/date.js";
 import { User } from "../../models/user.js";
 import { Event } from "../../models/event.js";
+// import DataLoader from "dataloader";
 
 
 export const user = async (userId) => {
@@ -22,6 +23,8 @@ export const singleEvent = async (eventId) => {
   }
 };
 
+
+
 export const transformBooking = (booking) => {
   return {
     ...booking._doc,
@@ -39,3 +42,23 @@ export const transformEvent = (event) => {
     date: dateToString(event._doc.date),
   };
 };
+
+const events = async eventIds => {
+  try {
+    const events = await Event.find({ _id: { $in: eventIds } });
+    return events.map(event => {
+      return transformEvent(event);
+    });
+  } catch (err) {
+    throw err;
+  }
+};
+
+
+// const eventLoader = new DataLoader((eventIds) => {
+//   return events(eventIds);
+// });
+
+// const userLoader = new DataLoader(userIds => {
+//   return User.find({_id: {$in: userIds}});
+// });

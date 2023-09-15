@@ -97,7 +97,6 @@ const BookingsPage = () => {
     if (!selectedBooking?._id) {
       return;
     }
-    console.log(selectedBooking._id);
     try {
       const requestBody = {
         query: `

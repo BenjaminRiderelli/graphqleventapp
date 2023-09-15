@@ -216,8 +216,7 @@ const EventsPage = () => {
         throw new Error("Failed!");
       }
 
-      const payload = await res.json();
-      console.log(payload);
+      // const payload = await res.json();
       closeModalFn()
     } catch (e) {
       console.log(e);
@@ -339,7 +338,7 @@ const EventsPage = () => {
           </button>
         </div>
       )}
-      <ul className="flex flex-col gap-2 w-[50rem] max-w-[90%] h-[40rem] max-h-[60%] list-none p-4 overflow-y-auto">
+      <ul className="flex flex-col gap-2 w-[92rem] max-w-[90%] h-[40rem] max-h-[60%] list-none p-4 overflow-y-auto">
         {isLoading ? (
           <Spinner />
         ) : (
