@@ -1,6 +1,9 @@
 import { useState, useContext } from "react";
 import { Context } from "../context";
 import { useNavigate, Navigate } from "react-router-dom";
+import { setStorageUserSession } from "../utils";
+
+
 type LoginFormInput = {
   email: string;
   password: string;
@@ -78,6 +81,7 @@ const AuthPage = () => {
       setMessage("");
       if (payload.data.login.token) {
         const payloadData = payload.data.login;
+        setStorageUserSession(payloadData)
         setUserSession(payloadData);
         navigate("/events");
       }

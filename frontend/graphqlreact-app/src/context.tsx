@@ -1,4 +1,5 @@
 import { createContext, useState } from "react";
+import { getUserSession } from "./utils";
 
 type ContextProps = {
   children: React.ReactNode;
@@ -21,7 +22,7 @@ export const Context = createContext<ContextValues>({
 });
 
 export const ContextProvider = ({ children }: ContextProps) => {
-  const [userSession, setUserSession] = useState<null | userSession>(null);
+  const [userSession, setUserSession] = useState<null | userSession>(getUserSession());
 
   const contextValue: ContextValues = {
     userSession: userSession,

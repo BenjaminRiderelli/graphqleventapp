@@ -9,7 +9,7 @@ import Modal from "../components/modal/modal";
 import { Context } from "../context";
 import EventListItem from "../components/eventlistitem/eventlistitem";
 import Spinner from "../components/spinner/spinner";
-import { formatDate } from "../utils";
+import { formatDate, getUserSession } from "../utils";
 
 type FormDataType = {
   title: string;
@@ -213,14 +213,17 @@ const EventsPage = () => {
       });
 
       if (res.status !== 200 && res.status !== 201) {
-        throw new Error("Failed!");
+        const payload = await res.json();
+        throw new Error(payload.errors[0].message);
       }
 
+
       // const payload = await res.json();
-      closeModalFn()
-    } catch (e) {
-      console.log(e);
-      setMessage("Something went wrong x_x");
+      // console.log(payload)
+
+      closeModalFn();
+    } catch (e:any) {
+      setMessage(e.message);
     }
   };
 

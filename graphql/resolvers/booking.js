@@ -28,13 +28,27 @@ export const bookingResolver = {
           "The event you're tying to book is no longuer available"
         );
       }
+
+      const bookingCheck = await Booking.find({
+        event: fetchedEvent._id,
+        user: req.userId,
+      });
+
+      if (bookingCheck.length > 0) {
+        throw new Error(
+          "You're already booked fot his event"
+        );
+      }
+
       const booking = new Booking({
         user: req.userId,
         event: fetchedEvent,
       });
+
       const result = await booking.save();
       return transformBooking(result);
     } catch (e) {
+      console.log(e);
       throw e;
     }
   },

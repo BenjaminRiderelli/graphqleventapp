@@ -9,11 +9,14 @@ type CreatorType = {
   email: string;
 };
 
+type TabType = "bookings" | "charts";
+
 type EventType = {
   _id: string;
   title: string;
   date: string;
   creator: CreatorType;
+  price: number;
 };
 
 type Booking = {
@@ -47,6 +50,7 @@ const BookingsPage = () => {
                _id
                title
                date
+               price
                creator{
                 _id
                 email
@@ -131,7 +135,7 @@ const BookingsPage = () => {
   };
 
   return (
-    <main className="flex items-center justify-center w-full h-full mt-16 border-2 border-t-0 border-black">
+    <main className="flex flex-col items-center  w-full h-full mt-16 border-2 border-t-0 border-black">
       {cancelBookingModal && (
         <Modal
           btnText="Confirm"
@@ -142,13 +146,13 @@ const BookingsPage = () => {
       )}
       <ul className="flex flex-col gap-2 w-[50rem] max-w-[90%] h-[40rem] max-h-[60%] list-none p-4 overflow-y-auto">
         {isLoading && <Spinner />}
-        {bookings?.map((booking) => (
-          <BookingsListItem
-            key={booking._id}
-            modalFn={openModal}
-            booking={booking}
-          />
-        ))}
+        {  bookings?.map((booking) => (
+            <BookingsListItem
+              key={booking._id}
+              modalFn={openModal}
+              booking={booking}
+            />
+          ))}
       </ul>
     </main>
   );

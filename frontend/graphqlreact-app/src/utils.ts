@@ -1,3 +1,9 @@
+type userSession = {
+  token: string;
+  userId: string;
+  tokenExpiration: number;
+};
+
 export const formatDate = (inputDate: string | undefined) => {
   if (!inputDate) {
     return;
@@ -35,4 +41,44 @@ export const fullIsoStringToReadableFormat = (isoString: string) => {
     )} - ${extractTimeFromISOString(isoString)}`;
     return readableFormatDate;
   }
+};
+
+
+export const getStorageObject = (key:string) => {
+  const item = localStorage.getItem(key);
+  if (item !== null) {
+    return JSON.parse(item);
+  }
+  return null;
+};
+
+export const setStorageObject = (key:string, object:object) => {
+  localStorage.setItem(key, JSON.stringify(object));
+};
+
+export const deleteStorageObject = (key:string) => {
+  localStorage.removeItem(key);
+};
+
+export const getUserToken = () => {
+  const session = getStorageObject("user-session");
+  if (session) {
+    return session.token;
+  }
+  return null;
+};
+export const getUserSession = () => {
+  const session = getStorageObject("user-session");
+  if (session) {
+    return session;
+  }
+  return null;
+};
+
+export const setStorageUserSession = (sessionData:userSession) => {
+  setStorageObject("user-session", sessionData);
+};
+
+export const removeSession = () => {
+  deleteStorageObject("user-session");
 };

@@ -3,6 +3,7 @@ import { Context } from "../../context";
 import CustomNavLink from "./customnavlink";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { NavLink, useNavigate } from "react-router-dom";
+import { removeSession } from "../../utils";
 
 const MainNavigation = () => {
   const [nav, setNav] = useState(false);
@@ -11,6 +12,7 @@ const MainNavigation = () => {
   const { userSession, setUserSession } = useContext(Context);
 
   const logOut = () => {
+    removeSession()
     setUserSession(null);
     navigate("/auth");
   };

@@ -11,6 +11,7 @@ type EventType = {
   title: string;
   date: string;
   creator: CreatorType;
+  price:number
 };
 
 type BookingType = {
