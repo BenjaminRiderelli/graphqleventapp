@@ -3,6 +3,7 @@ import { Context } from "../context";
 import Spinner from "../components/spinner/spinner";
 import BookingsListItem from "../components/bookings/bookingslistitem";
 import Modal from "../components/modal/modal";
+import { Navigate } from "react-router-dom";
 
 type CreatorType = {
   _id: string;
@@ -60,7 +61,6 @@ const BookingsPage = () => {
           }
         `,
     };
-
     fetch("http://localhost:3000/graphql", {
       method: "POST",
       body: JSON.stringify(requestBody),
@@ -122,7 +122,8 @@ const BookingsPage = () => {
       });
 
       if (res.status !== 200 && res.status !== 201) {
-        throw new Error("Failed!");
+        const payload = await res.json();
+        throw new Error(payload.errors[0].message);
       }
 
       // const payload = await res.json();
@@ -133,6 +134,10 @@ const BookingsPage = () => {
       console.log(e);
     }
   };
+
+  if (!userSession?.token) {
+    return <Navigate to="/auth" />;
+  }
 
   return (
     <main className="flex flex-col items-center  w-full h-full mt-16 border-2 border-t-0 border-black">
@@ -146,13 +151,13 @@ const BookingsPage = () => {
       )}
       <ul className="flex flex-col gap-2 w-[50rem] max-w-[90%] h-[40rem] max-h-[60%] list-none p-4 overflow-y-auto">
         {isLoading && <Spinner />}
-        {  bookings?.map((booking) => (
-            <BookingsListItem
-              key={booking._id}
-              modalFn={openModal}
-              booking={booking}
-            />
-          ))}
+        {bookings?.map((booking) => (
+          <BookingsListItem
+            key={booking._id}
+            modalFn={openModal}
+            booking={booking}
+          />
+        ))}
       </ul>
     </main>
   );

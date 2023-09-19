@@ -20,7 +20,6 @@ export const bookingResolver = {
     if (!req.isAuth) {
       throw new Error("Unauthorized");
     }
-
     try {
       const fetchedEvent = await Event.findOne({ _id: args.eventId });
       if (!fetchedEvent) {
@@ -28,7 +27,6 @@ export const bookingResolver = {
           "The event you're tying to book is no longuer available"
         );
       }
-
       const bookingCheck = await Booking.find({
         event: fetchedEvent._id,
         user: req.userId,
@@ -39,12 +37,10 @@ export const bookingResolver = {
           "You're already booked fot his event"
         );
       }
-
       const booking = new Booking({
         user: req.userId,
         event: fetchedEvent,
       });
-
       const result = await booking.save();
       return transformBooking(result);
     } catch (e) {

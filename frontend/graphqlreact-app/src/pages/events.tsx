@@ -216,11 +216,8 @@ const EventsPage = () => {
         const payload = await res.json();
         throw new Error(payload.errors[0].message);
       }
-
-
       // const payload = await res.json();
       // console.log(payload)
-
       closeModalFn();
     } catch (e:any) {
       setMessage(e.message);
